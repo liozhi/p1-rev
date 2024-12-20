@@ -1,7 +1,10 @@
 package com.revature.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component // makes the class a Bean
 @Entity // makes a database table based on the class
@@ -27,16 +30,21 @@ public class User {
     @Column(nullable = false)
     private String role = "user"; // Default to this value
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore // prevents circular reference
+    private List<Reimbursement> reimbursements;
+
     public User() {
     }
 
-    public User(int userId, String role, String lastName, String firstName, String password, String username) {
+    public User(int userId, String username, String password, String role, String firstName, String lastName, List<Reimbursement> reimbursements) {
         this.userId = userId;
         this.role = role;
         this.lastName = lastName;
         this.firstName = firstName;
         this.password = password;
         this.username = username;
+        this.reimbursements = reimbursements;
     }
 
     public int getUserId() {
@@ -87,6 +95,14 @@ public class User {
         this.role = role;
     }
 
+    public List<Reimbursement> getReimbursements() {
+        return reimbursements;
+    }
+
+    public void setReimbursements(List<Reimbursement> reimbursements) {
+        this.reimbursements = reimbursements;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -96,6 +112,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", role='" + role + '\'' +
+                ", reimbursements='" + reimbursements + '\'' +
                 '}';
     }
 }

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { store } from "../store";
 
 interface User {
 	username: string,
@@ -29,9 +30,10 @@ const Login: React.FC = () => {
 
 	const login = async () => {
 		if (user.username != "" && user.password != "") {
-			const response = await axios.post("http://localhost:4444/auth", user, {withCredentials: true})
+			await axios.post("http://localhost:4444/auth", user, {withCredentials: true})
 			.then((res) => {
-				console.log(res);
+				store.loggedInUser = res.data;
+				alert("Logged in as " + store.loggedInUser.username)
 				if (res.data.role === "player") {
 					navigate("/teams");
 				} else {

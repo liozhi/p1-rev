@@ -1,8 +1,6 @@
 package com.revature.services;
 
-import com.revature.daos.TeamDAO;
 import com.revature.daos.UserDAO;
-import com.revature.models.Team;
 import com.revature.models.dtos.IncomingUserDTO;
 import com.revature.models.User;
 import com.revature.models.dtos.OutgoingUserDTO;
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -27,7 +24,7 @@ public class UserService {
     public User insertUser(IncomingUserDTO userDTO) {
         // uid gets autogenned
         // can add .orElseThrow() at the end here, comes with Optional
-        User user = new User(0, userDTO.getUsername(), userDTO.getPassword(), userDTO.getRole(), userDTO.getFirstName(), userDTO.getLastName());
+        User user = new User(0, userDTO.getUsername(), userDTO.getPassword(), "user", userDTO.getFirstName(), userDTO.getLastName(), null);
 
         return userDAO.save(user);
     }

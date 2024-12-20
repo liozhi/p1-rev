@@ -1,7 +1,5 @@
 package com.revature.models.dtos;
 
-import com.revature.models.Team;
-
 public class OutgoingUserDTO {
 
     private int userId;

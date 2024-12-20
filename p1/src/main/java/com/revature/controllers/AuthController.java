@@ -29,6 +29,8 @@ public class AuthController {
         // use session to store user info to check authorization, or logged in status
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("username", user.getUsername());
+        session.setAttribute("firstName", user.getFirstName());
+        session.setAttribute("lastName", user.getLastName());
         session.setAttribute("role", user.getRole());
 
         return ResponseEntity.ok(user);

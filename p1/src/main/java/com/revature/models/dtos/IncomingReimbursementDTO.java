@@ -4,16 +4,14 @@ public class IncomingReimbursementDTO {
 
     private String description;
     private float amount;
-    private String status = "pending";
     private int userId;
 
     public IncomingReimbursementDTO() {
     }
 
-    public IncomingReimbursementDTO(String description, float amount, String status, int userId) {
+    public IncomingReimbursementDTO(String description, float amount, int userId) {
         this.description = description;
         this.amount = amount;
-        this.status = status;
         this.userId = userId;
     }
 
@@ -33,14 +31,6 @@ public class IncomingReimbursementDTO {
         this.amount = amount;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public int getUserId() {
         return userId;
     }
@@ -53,8 +43,7 @@ public class IncomingReimbursementDTO {
     public String toString() {
         return "IncomingReimbursementDTO{" +
                 "description='" + description + '\'' +
-                ", amount=" + amount +
-                ", status='" + status + '\'' +
+                ", amount=" + amount + '\'' +
                 ", userId=" + userId +
                 '}';
     }

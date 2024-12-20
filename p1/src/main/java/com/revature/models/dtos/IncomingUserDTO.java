@@ -10,17 +10,15 @@ public class IncomingUserDTO {
 
     private String username;
     private String password;
-    private String role = "player";
     private String firstName;
     private String lastName;
 
     public IncomingUserDTO() {
     }
 
-    public IncomingUserDTO(String username, String password, String role, String firstName, String lastName) {
+    public IncomingUserDTO(String username, String password, String firstName, String lastName) {
         this.username = username;
         this.password = password;
-        this.role = role;
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -39,14 +37,6 @@ public class IncomingUserDTO {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getFirstName() {
@@ -70,7 +60,6 @@ public class IncomingUserDTO {
         return "IncomingUserDTO{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 '}';

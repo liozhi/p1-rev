@@ -23,17 +23,17 @@ public class Reimbursement {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId") // fkey
-    private int userId;
+    private User user;
 
     public Reimbursement() {
     }
 
-    public Reimbursement(int reimbursementId, String description, float amount, String status, int userId) {
+    public Reimbursement(int reimbursementId, String description, float amount, String status, User user) {
         this.reimbursementId = reimbursementId;
         this.description = description;
         this.amount = amount;
         this.status = status;
-        this.userId = userId;
+        this.user = user;
     }
 
     public int getReimbursementId() {
@@ -68,12 +68,12 @@ public class Reimbursement {
         this.status = status;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class Reimbursement {
                 ", description='" + description + '\'' +
                 ", amount=" + amount +
                 ", status='" + status + '\'' +
-                ", userId=" + userId +
+                ", user=" + user +
                 '}';
     }
 }
