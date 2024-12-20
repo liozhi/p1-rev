@@ -11,16 +11,18 @@ public class IncomingUserDTO {
     private String username;
     private String password;
     private String role = "player";
-    private int teamId;
+    private String firstName;
+    private String lastName;
 
     public IncomingUserDTO() {
     }
 
-    public IncomingUserDTO(String username, String password, String role, int teamId) {
+    public IncomingUserDTO(String username, String password, String role, String firstName, String lastName) {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.teamId = teamId;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public String getUsername() {
@@ -47,12 +49,20 @@ public class IncomingUserDTO {
         this.role = role;
     }
 
-    public int getTeamId() {
-        return teamId;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setTeamId(int teamId) {
-        this.teamId = teamId;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     @Override
@@ -61,7 +71,8 @@ public class IncomingUserDTO {
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
-                ", teamId=" + teamId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 '}';
     }
 }

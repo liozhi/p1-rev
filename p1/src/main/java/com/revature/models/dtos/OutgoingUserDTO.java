@@ -7,16 +7,18 @@ public class OutgoingUserDTO {
     private int userId;
     private String username;
     private String role;
-    private Team team;
+    private String firstName;
+    private String lastName;
 
     public OutgoingUserDTO() {
     }
 
-    public OutgoingUserDTO(int userId, String username, String role, Team team) {
+    public OutgoingUserDTO(int userId, String username, String role, String firstName, String lastName) {
         this.userId = userId;
         this.username = username;
         this.role = role;
-        this.team = team;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public int getUserId() {
@@ -43,12 +45,20 @@ public class OutgoingUserDTO {
         this.role = role;
     }
 
-    public Team getTeam() {
-        return team;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     @Override
@@ -57,7 +67,8 @@ public class OutgoingUserDTO {
                 "userId=" + userId +
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
-                ", team=" + team +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 '}';
     }
 }

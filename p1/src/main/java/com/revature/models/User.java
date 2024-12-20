@@ -19,22 +19,24 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String role = "player"; // Default to this value
+    private String firstName;
 
-    // fetch defines when the dependency is loaded. lazy - load only when called, eager - load at runtime
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "teamId") // fkey
-    private Team team;
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column(nullable = false)
+    private String role = "user"; // Default to this value
 
     public User() {
     }
 
-    public User(int userId, String username, String password, String role, Team team) {
+    public User(int userId, String role, String lastName, String firstName, String password, String username) {
         this.userId = userId;
-        this.username = username;
-        this.password = password;
         this.role = role;
-        this.team = team;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.password = password;
+        this.username = username;
     }
 
     public int getUserId() {
@@ -61,6 +63,22 @@ public class User {
         this.password = password;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public String getRole() {
         return role;
     }
@@ -69,22 +87,15 @@ public class User {
         this.role = role;
     }
 
-    public Team getTeam() {
-        return team;
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
     @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", role='" + role + '\'' +
-                ", team='" + team +
                 '}';
     }
-
 }

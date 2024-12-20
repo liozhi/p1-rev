@@ -23,6 +23,6 @@ public class AuthService {
         User u = authDAO.findByUsernameAndPassword(loginDTO.getUsername(), loginDTO.getPassword());
         if (u == null) throw new IllegalArgumentException("No user found with sent credentials");
 
-        return new OutgoingUserDTO(u.getUserId(), u.getUsername(), u.getRole(), u.getTeam());
+        return new OutgoingUserDTO(u.getUserId(), u.getUsername(), u.getRole(), u.getFirstName(), u.getLastName());
     }
 }

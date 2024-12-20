@@ -18,25 +18,17 @@ import java.util.Optional;
 public class UserService {
 
     private final UserDAO userDAO;
-    private final TeamDAO teamDAO;
 
     @Autowired
-    public UserService(UserDAO userDAO, TeamDAO teamDAO) {
+    public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
-        this.teamDAO = teamDAO;
     }
 
     public User insertUser(IncomingUserDTO userDTO) {
         // uid gets autogenned
         // can add .orElseThrow() at the end here, comes with Optional
-        User user = new User(0, userDTO.getUsername(), userDTO.getPassword(), userDTO.getRole(), null);
+        User user = new User(0, userDTO.getUsername(), userDTO.getPassword(), userDTO.getRole(), userDTO.getFirstName(), userDTO.getLastName());
 
-        // findById returns an Optional which we can use to avoid nulls and help with error handling
-        Optional<Team> team = teamDAO.findById(userDTO.getTeamId());
-
-        if (team.isEmpty()) throw new IllegalArgumentException("No team found with id " + userDTO.getTeamId());
-
-        user.setTeam(team.get());
         return userDAO.save(user);
     }
 
@@ -61,7 +53,8 @@ public class UserService {
                     user.getUserId(),
                     user.getUsername(),
                     user.getRole(),
-                    user.getTeam()
+                    user.getFirstName(),
+                    user.getLastName()
             ));
         }
 
