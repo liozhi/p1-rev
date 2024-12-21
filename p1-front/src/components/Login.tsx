@@ -33,9 +33,10 @@ const Login: React.FC = () => {
 			await axios.post("http://localhost:4444/auth", user, {withCredentials: true})
 			.then((res) => {
 				store.loggedInUser = res.data;
+				localStorage.setItem("reimbUser", JSON.stringify(res.data));
 				alert("Logged in as " + store.loggedInUser.username)
-				if (res.data.role === "player") {
-					navigate("/teams");
+				if (res.data.role === "user") {
+					navigate("/reimbursements");
 				} else {
 					navigate("/users");
 				}

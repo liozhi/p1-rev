@@ -2,17 +2,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Button, Container, Table } from "react-bootstrap";
 
-interface Team {
-	teamId: number,
-	teamName: string,
-	teamLocation: string
-}
-
 interface User {
 	userId: number,
 	username: string,
 	role: string,
-	team: Team
+
+	firstName: string,
+	lastName: string
 }
 
 const Users: React.FC = () => {
@@ -24,7 +20,7 @@ const Users: React.FC = () => {
 	}, []);
 
 	const getUsers = async () => {
-		const response = await axios.get("http://localhost:4444/users", {withCredentials: true})
+		await axios.get("http://localhost:4444/users", {withCredentials: true})
 		.then((res) => {
 			setUsers(res.data);
 			console.log(res.data);
@@ -56,8 +52,9 @@ const Users: React.FC = () => {
 								<tr id = {"user" + user.userId}>
 									<td>{user.userId}</td>
 									<td>{user.username}</td>
+									<td>{user.firstName}</td>
+									<td>{user.lastName}</td>
 									<td>{user.role}</td>
-									<td>{user.team.teamName}</td>
 									<td>
 										{user.role === "player" 
 											? <Button className = "btn-info" onClick = {() => alert("Promoted user id " + user.userId)}>Promote</Button>

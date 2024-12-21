@@ -3,6 +3,7 @@ export const store: any = {
 		userId: 0,
 		username: "",
 		role: "",
-		team: {}
+		firstName: "",
+		lastName: ""
 	}
 }

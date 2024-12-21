@@ -5,9 +5,12 @@ import com.revature.daos.UserDAO;
 import com.revature.models.Reimbursement;
 import com.revature.models.User;
 import com.revature.models.dtos.IncomingReimbursementDTO;
+import com.revature.models.dtos.OutgoingReimbursementDTO;
+import com.revature.models.dtos.OutgoingUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,31 +26,70 @@ public class ReimbursementService {
         this.userDAO = userDAO;
     }
 
-    public Reimbursement insertReimbursement(IncomingReimbursementDTO reimbursementDTO) {
-        Reimbursement re = reimbursementDAO.save(new Reimbursement(
+    public OutgoingReimbursementDTO insertReimbursement(IncomingReimbursementDTO reimbursementDTO) {
+        Reimbursement re = new Reimbursement(
                 0,
                 reimbursementDTO.getDescription(),
                 reimbursementDTO.getAmount(),
                 "pending",
                 null
-        ));
+        );
 
         Optional<User> user = userDAO.findById(reimbursementDTO.getUserId());
         if (user.isEmpty()) throw new IllegalArgumentException("No user found with id " + reimbursementDTO.getUserId());
         re.setUser(user.get());
-        return re;
+        reimbursementDAO.save(re);
+        return sanitizeReimbursements(re);
     }
 
-    public List<Reimbursement> getAllReimbursementsByUserId(int uid) {
-        return reimbursementDAO.findAllByUserUserId(uid);
+    public List<OutgoingReimbursementDTO> getAllReimbursementsByUserId(int uid) {
+        return sanitizeReimbursements(reimbursementDAO.findAllByUserUserId(uid));
     }
 
-    public List<Reimbursement> getAllPendingReimbursements() {
-        return reimbursementDAO.findAllByStatus("pending");
+    public List<OutgoingReimbursementDTO> getAllPendingReimbursements() {
+        return sanitizeReimbursements(reimbursementDAO.findAllByStatus("pending"));
     }
 
-    public List<Reimbursement> getAllReimbursements() {
-        return reimbursementDAO.findAll();
+    public List<OutgoingReimbursementDTO> getAllReimbursements() {
+        return sanitizeReimbursements(reimbursementDAO.findAll());
+    }
+
+    private List<OutgoingReimbursementDTO> sanitizeReimbursements(List<Reimbursement> reList) {
+        List<OutgoingReimbursementDTO> newReList = new ArrayList<>();
+        for (Reimbursement re : reList) {
+            newReList.add(new OutgoingReimbursementDTO(
+                    re.getReimbursementId(),
+                    re.getDescription(),
+                    re.getAmount(),
+                    re.getStatus(),
+                    new OutgoingUserDTO(
+                            re.getUser().getUserId(),
+                            re.getUser().getUsername(),
+                            re.getUser().getRole(),
+                            re.getUser().getFirstName(),
+                            re.getUser().getLastName()
+                    )
+            ));
+        }
+
+        return newReList;
+    }
+
+    // Remove password from user field in Reimbursement (thanks Spring, very cool)
+    private OutgoingReimbursementDTO sanitizeReimbursements(Reimbursement re) {
+        return new OutgoingReimbursementDTO(
+                    re.getReimbursementId(),
+                    re.getDescription(),
+                    re.getAmount(),
+                    re.getStatus(),
+                    new OutgoingUserDTO(
+                            re.getUser().getUserId(),
+                            re.getUser().getUsername(),
+                            re.getUser().getRole(),
+                            re.getUser().getFirstName(),
+                            re.getUser().getLastName()
+                    )
+            );
     }
 
     public Reimbursement updateReimbursement(int reId, String status) {
