@@ -1,24 +1,27 @@
 import axios from "axios";
 import { useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 interface User {
 	username: string,
 	password: string,
-	teamId: number
+	firstName: string,
+	lastName: string
 }
 
 const Registration: React.FC = () => {
 
+	const navigate = useNavigate();
+
 	const [newUser, setNewUser] = useState<User>({
 		username: "",
 		password: "",
-		teamId: -1,
+		firstName: "",
+		lastName: "",
 	});
 
 	const storeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(e);
-
 		const name = e.target.name;
 		const value = e.target.value;
 
@@ -27,41 +30,50 @@ const Registration: React.FC = () => {
 	}
 
 	const register = async () => {
-		const response = await axios.post("http://localhost:4444/users", newUser, {withCredentials: true})
+		await axios.post("http://localhost:4444/users", newUser, {withCredentials: true})
 		.then((res) => {
-			console.log("Created user " + newUser.username)
+			alert("Signed up as " + newUser.username);
+			navigate("/");
 		})
 		.catch((error) => {
-			console.log(error)
+			console.log(error);
 		})
 	}
 
 	return (
 		<>
-			<Container className = "d-flex flex-column justify-content-center align-items-center mt-5 gap-1">
-				<p>Register</p>
+			<Container className = "d-flex flex-column justify-content-center align-items-center mt-5 gap-2">
+				<p className = "font-black text-4xl text-white text-center">Register</p>
 				
 				<div>
 					<Form.Control
 						type = "text"
-						placeholder = "usename"
+						placeholder = "Username"
 						name = "username"
 						onChange = {storeValues}
 					/>
 				</div>
 				<div>
 					<Form.Control
-						type = "number"
-						placeholder = "team ID"
-						name = "teamId"
+						type = "password"
+						placeholder = "Password"
+						name = "password"
 						onChange = {storeValues}
 					/>
 				</div>
 				<div>
 					<Form.Control
-						type = "password"
-						placeholder = "password"
-						name = "password"
+						type = "text"
+						placeholder = "First Name"
+						name = "firstName"
+						onChange = {storeValues}
+					/>
+				</div>
+				<div>
+					<Form.Control
+						type = "text"
+						placeholder = "Last Name"
+						name = "lastName"
 						onChange = {storeValues}
 					/>
 				</div>

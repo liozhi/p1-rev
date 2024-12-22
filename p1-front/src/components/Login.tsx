@@ -19,8 +19,6 @@ const Login: React.FC = () => {
 	});
 
 	const storeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
-		//console.log(e);
-
 		const name = e.target.name;
 		const value = e.target.value;
 
@@ -50,8 +48,8 @@ const Login: React.FC = () => {
 
 	return (
 		<>
-			<Container className = "d-flex flex-column justify-content-center align-items-center mt-5 gap-1">
-				<p>Login</p>
+			<Container className = "d-flex flex-column justify-content-center align-items-center mt-5 gap-2">
+				<p className = "font-black text-4xl text-white text-center">Login</p>
 				
 				<div>
 					<Form.Control
