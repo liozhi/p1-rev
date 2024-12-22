@@ -1,8 +1,10 @@
 package com.revature.controllers;
 
+import com.revature.aspects.AdminOnly;
 import com.revature.models.Reimbursement;
 import com.revature.models.dtos.IncomingReimbursementDTO;
 import com.revature.models.dtos.OutgoingReimbursementDTO;
+import com.revature.models.dtos.UpdateReimbursementDTO;
 import com.revature.services.ReimbursementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,15 @@ public class ReimbursementController {
     }
 
     @GetMapping("/all")
+    @AdminOnly
     public ResponseEntity<List<OutgoingReimbursementDTO>> getAllReimbursements() {
         return ResponseEntity.ok(reimbursementService.getAllReimbursements());
+    }
+
+    @PatchMapping("/all")
+    @AdminOnly
+    public ResponseEntity<OutgoingReimbursementDTO> updateReimbursement(@RequestBody UpdateReimbursementDTO re) {
+        OutgoingReimbursementDTO newRe = reimbursementService.updateReimbursement(re.getReimbursementId(), re.getStatus());
+        return ResponseEntity.status(201).body(newRe);
     }
 }

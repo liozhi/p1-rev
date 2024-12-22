@@ -21,41 +21,39 @@ interface Reimbursement {
 	user: User
 }
 
-interface ReimbursementForm {
-	description: string,
-	amount: number
-}
-
-const Reimbursements: React.FC = () => {
+const ReimbursementsAdmin: React.FC = () => {
 
 	const [re, setRe] = useState<Reimbursement[]>([]);
 	const [shownRe, setShownRe] = useState<Reimbursement[]>([]);
 	const navigate = useNavigate();
 
-	const [showModal, setShowModal] = useState<boolean>(false);
-	const handleClose = () => setShowModal(false);
-	const handleOpen = () => setShowModal(true);
-
 	const [showOnlyPending, setShowOnlyPending] = useState<boolean>(false);
-
-	const [reForm, setReForm] = useState<ReimbursementForm>({
-		description: "",
-		amount: 0
-	});
 
 	useEffect(() => {
 		getReimbs();
 	}, []);
 
 	useEffect(() => {
-		filterReimbursements();
+		filterReimbursements(re);
 	}, [showOnlyPending])
+	
+	const filterReimbursements = (reList: Reimbursement[]) => {
+		console.log(reList);
+		if (showOnlyPending) {
+			const newRe: Reimbursement[] = reList.filter((r: Reimbursement) => {
+				return (r.status === "pending")
+			});
+			setShownRe(newRe);
+		} else {
+			setShownRe(reList);
+		}
+	}
 
 	const getReimbs = async () => {
-		await axios.get("http://localhost:4444/reimb/" + store.loggedInUser.userId, { withCredentials: true })
+		await axios.get("http://localhost:4444/reimb/all", { withCredentials: true })
 			.then((res) => {
 				setRe(res.data);
-				setShownRe(res.data);
+				filterReimbursements(res.data);
 			})
 			.catch((error) => {
 				if (error.response) {
@@ -63,79 +61,27 @@ const Reimbursements: React.FC = () => {
 						store.loggedInUser = { userId: 0, username: "", role: "", firstName: "", lastName: "" };
 						localStorage.setItem("reimbUser", JSON.stringify({ userId: 0, username: "", role: "", firstName: "", lastName: "" }));
 						navigate("/");
+					} else if (error.response.data === "Authorization invalid") {
+						navigate("/");
 					}
 				}
 			});
 	}
-	
-	const storeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const name = e.target.name;
-		const value = e.target.value;
 
-		setReForm((reForm) => ({...reForm, [name]: value}));
-	}
-
-	const handleSubmit = async (e: any) => {
-		e.preventDefault();
-		await axios.post("http://localhost:4444/reimb", {
-			description: reForm.description,
-			amount: reForm.amount,
-			userId: store.loggedInUser.userId
-		}, {withCredentials: true})
+	const updateReimb = async(id: number, status: string) => {
+		await axios.patch("http://localhost:4444/reimb/all", {reimbursementId: id, status: status}, { withCredentials: true })
 		.then((res) => {
-			console.log(res);
-			handleClose();
+			console.log(res.data);
 			getReimbs();
 		})
-		.catch((error) => {
-			console.log(error);
-		})
 	}
-
-	const filterReimbursements = () => {
-		if (showOnlyPending) {
-			const newRe: Reimbursement[] = re.filter((r: Reimbursement) => {
-				return (r.status === "pending")
-			});
-			setShownRe(newRe);
-		} else {
-			setShownRe(re);
-		}
-	}
-
 
 	return (
 		<>
-			<Modal show = {showModal} onHide = {handleClose}>
-				<Modal.Body>
-					<Form>
-						<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-							<Form.Label>Amount</Form.Label>
-							<Form.Control
-								type="number"
-								name = "amount"
-								onChange = {storeValues}
-								autoFocus
-							/>
-						</Form.Group>
-						<Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-							<Form.Label>Description</Form.Label>
-							<Form.Control as="textarea" rows={2} name = "description" onChange = {storeValues}/>
-						</Form.Group>
-					</Form>
-					<Button variant = "secondary" onClick = {handleClose}>
-						Close
-					</Button>
-					<Button variant = "primary" onClick = {handleSubmit}>
-						Submit
-					</Button>
-				</Modal.Body>
-			</Modal>
 			<div className = "flex flex-col justify-center align-center w-2/3 m-auto gap-2">
-				<p className = "font-black text-4xl text-white text-center">Your Reimbursements</p>
-				<div className = "flex flex-row flex-initial justify-left align-center gap-2">
-					<Button onClick = {handleOpen}>New reimbursement</Button>
-					<ToggleButton
+				<p className = "font-black text-4xl text-white text-center">Employee Reimbursements</p>
+				<div className = "flex flex-row flex-initial justify-left align-center">
+					<ToggleButton 
 						id = "toggle-pending"
 						type = "checkbox"
 						variant = "outline-warning"
@@ -150,9 +96,12 @@ const Reimbursements: React.FC = () => {
 					<thead>
 						<tr>
 							<th>ID</th>
+							<th>Employee</th>
 							<th>Amount</th>
 							<th>Desc</th>
 							<th>Status</th>
+							<th>Actions</th>
+							<th> 	</th>
 						</tr>
 					</thead>
 
@@ -167,9 +116,18 @@ const Reimbursements: React.FC = () => {
 							return (
 								<tr key={"reim" + reim.reimbursementId}>
 									<td>{reim.reimbursementId}</td>
+									<td>{reim.user.firstName + " " + reim.user.lastName}</td>
 									<td>{"$" + reim.amount}</td>
 									<td>{reim.description}</td>
 									<td><p className = {statusClass}>{reim.status.toUpperCase()}</p></td>
+									{reim.status === "pending" 
+										? <td><Button className = "btn-success" onClick = {() => updateReimb(reim.reimbursementId, "accepted")}>Accept</Button></td>
+										: <td> </td>
+									}
+									{reim.status === "pending" 
+										? <td><Button className = "btn-danger" onClick = {() => updateReimb(reim.reimbursementId, "denied")}>Deny</Button></td>
+										: <td> </td>
+									}
 								</tr>
 							)
 						})}
@@ -180,4 +138,4 @@ const Reimbursements: React.FC = () => {
 	)
 }
 
-export default Reimbursements;
+export default ReimbursementsAdmin;

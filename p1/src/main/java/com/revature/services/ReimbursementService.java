@@ -54,6 +54,7 @@ public class ReimbursementService {
         return sanitizeReimbursements(reimbursementDAO.findAll());
     }
 
+    // Remove password from user field in Reimbursement (thanks Spring, very cool)
     private List<OutgoingReimbursementDTO> sanitizeReimbursements(List<Reimbursement> reList) {
         List<OutgoingReimbursementDTO> newReList = new ArrayList<>();
         for (Reimbursement re : reList) {
@@ -75,7 +76,6 @@ public class ReimbursementService {
         return newReList;
     }
 
-    // Remove password from user field in Reimbursement (thanks Spring, very cool)
     private OutgoingReimbursementDTO sanitizeReimbursements(Reimbursement re) {
         return new OutgoingReimbursementDTO(
                     re.getReimbursementId(),
@@ -92,7 +92,7 @@ public class ReimbursementService {
             );
     }
 
-    public Reimbursement updateReimbursement(int reId, String status) {
+    public OutgoingReimbursementDTO updateReimbursement(int reId, String status) {
         Reimbursement newRe = reimbursementDAO.findById(reId).orElseThrow(() -> {
             throw new IllegalArgumentException("No reimbursement found with ID " + reId);
         });
@@ -100,6 +100,6 @@ public class ReimbursementService {
         // Probably have checks to make sure the status can be one of 3 strings - or do this on controller side
 
         newRe.setStatus(status);
-        return reimbursementDAO.save(newRe);
+        return sanitizeReimbursements(reimbursementDAO.save(newRe));
     }
 }
