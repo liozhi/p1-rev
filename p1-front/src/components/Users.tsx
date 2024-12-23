@@ -72,7 +72,7 @@ const Users: React.FC<UsersProps> = ({setToast}: UsersProps) => {
 	}
 
 	const promoteUser = async (uid: Number) => {
-		await axios.post("http://localhost:4444/users/" + uid, {withCredentials: true})
+		await axios.post("http://localhost:4444/users/" + uid, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
 		.then((res) => {
 			console.log(res.data);
 			setToast({active: true, message: "Promoted user with id " + uid + " to Manager!"});
