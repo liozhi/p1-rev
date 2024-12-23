@@ -102,4 +102,25 @@ public class ReimbursementService {
         newRe.setStatus(status);
         return sanitizeReimbursements(reimbursementDAO.save(newRe));
     }
+
+    public void deleteReimbursement(int reId) {
+        Reimbursement newRe = reimbursementDAO.findById(reId).orElseThrow(() -> {
+            throw new IllegalArgumentException("No reimbursement found with ID " + reId);
+        });
+        User user = userDAO.findById(newRe.getUser().getUserId()).orElseThrow(() -> {
+            throw new IllegalArgumentException("No user found with ID " + newRe.getUser().getUserId());
+        });
+        user.getReimbursements().clear();
+        reimbursementDAO.deleteById(reId);
+        userDAO.save(user);
+    }
+
+    public OutgoingReimbursementDTO updateReimbursementDescription(int reId, String description) {
+        Reimbursement newRe = reimbursementDAO.findById(reId).orElseThrow(() -> {
+            throw new IllegalArgumentException("No reimbursement found with ID " + reId);
+        });
+
+        newRe.setDescription(description);
+        return sanitizeReimbursements(reimbursementDAO.save(newRe));
+    }
 }

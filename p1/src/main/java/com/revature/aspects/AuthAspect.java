@@ -19,7 +19,8 @@ public class AuthAspect {
     @Order(1) // Login check should happen before authorization check
     @Before("within(com.revature.controllers.*)" +
             "&& !execution(* com.revature.controllers.AuthController.login(..))" +
-            "&& !execution(* com.revature.controllers.UserController.insertUser(..))")
+            "&& !execution(* com.revature.controllers.UserController.insertUser(..))" +
+            "&& !execution(* com.revature.controllers.AuthController.logout(..))")
     public void checkLoggedIn() {
         // Get access to the session
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();

@@ -13,10 +13,18 @@ import Reimbursements from './components/Reimbursements';
 import './index.css';
 import NavBar from './components/NavBar';
 import ReimbursementsAdmin from './components/ReimbursementsAdmin';
+import { Toast } from 'react-bootstrap';
+
+interface ToastMsg {
+	active: boolean,
+	message: string
+}
 
 const App = () => {
 
 	const [updateState, setUpdateState] = useState<number>(0); // forcing state updates, thanks react
+
+	const [toast, setToast] = useState<ToastMsg>({active: false, message: "aeiou"});
 	
 	useEffect(() => {
 		const userData = JSON.parse(localStorage.getItem("reimbUser")!);
@@ -28,13 +36,21 @@ const App = () => {
 	return (
 		<div className = "bg-stone-900 min-h-screen">
 			<NavBar/>
+			<div className = "absolute bottom-3 right-3">
+				<Toast onClose = {() => setToast({...toast, active: false})} show = {toast.active} delay = {5000} autohide>
+					<Toast.Header>
+						<strong className="me-auto">Alert</strong>
+					</Toast.Header>
+					<Toast.Body>{toast.message}</Toast.Body>
+				</Toast>
+			</div>
 				
 			<Routes>
-				<Route path = "/" element = {<Login/>} />
-				<Route path = "/register" element = {<Registration/>} />
-				<Route path = "/users" element = {<Users/>} />
-				<Route path = "/reimbursements" element = {<Reimbursements/>} />
-				<Route path = "/reimbursements/all" element = {<ReimbursementsAdmin/>} />
+				<Route path = "/" element = {<Login setToast = {setToast}/>} />
+				<Route path = "/register" element = {<Registration setToast = {setToast}/>} />
+				<Route path = "/users" element = {<Users setToast = {setToast}/>} />
+				<Route path = "/reimbursements" element = {<Reimbursements setToast = {setToast}/>} />
+				<Route path = "/reimbursements/all" element = {<ReimbursementsAdmin setToast = {setToast}/>} />
 			</Routes>
 		</div>
 	)

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { store } from "../store";
@@ -9,7 +9,16 @@ interface User {
 	password: string
 }
 
-const Login: React.FC = () => {
+interface ToastMsg {
+	active: boolean,
+	message: string
+}
+
+interface LoginProps {
+	setToast: Dispatch<SetStateAction<ToastMsg>>
+}
+
+const Login: React.FC<LoginProps> = ({setToast}: LoginProps) => {
 
 	const navigate = useNavigate();
 
@@ -32,7 +41,7 @@ const Login: React.FC = () => {
 			.then((res) => {
 				store.loggedInUser = res.data;
 				localStorage.setItem("reimbUser", JSON.stringify(res.data));
-				alert("Logged in as " + store.loggedInUser.username)
+				setToast({active: true, message: "Logged in as " + store.loggedInUser.username + "!"})
 				if (res.data.role === "user") {
 					navigate("/reimbursements");
 				} else {
@@ -41,7 +50,7 @@ const Login: React.FC = () => {
 			})
 			.catch((error) => {
 				console.log(error);
-				alert("Login failed!");
+				setToast({active: true, message: "Login failed!"})
 			})
 		}
 	}
@@ -54,7 +63,7 @@ const Login: React.FC = () => {
 				<div>
 					<Form.Control
 						type = "text"
-						placeholder = "usename"
+						placeholder = "Username"
 						name = "username"
 						onChange = {storeValues}
 					/>
@@ -62,7 +71,7 @@ const Login: React.FC = () => {
 				<div>
 					<Form.Control
 						type = "password"
-						placeholder = "password"
+						placeholder = "Password"
 						name = "password"
 						onChange = {storeValues}
 					/>

@@ -5,7 +5,9 @@ import com.revature.models.User;
 import com.revature.models.dtos.IncomingUserDTO;
 import com.revature.models.dtos.OutgoingUserDTO;
 import com.revature.services.UserService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +40,19 @@ public class UserController {
     @AdminOnly
     public ResponseEntity<List<OutgoingUserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @DeleteMapping("/{userId}")
+    @AdminOnly
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable int userId) {
+        userService.deleteUser(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{userId}")
+    @AdminOnly
+    public ResponseEntity<OutgoingUserDTO> promoteUser(@PathVariable int userId) {
+        return ResponseEntity.accepted().body(userService.promoteUser(userId));
     }
 
 }

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +10,16 @@ interface User {
 	lastName: string
 }
 
-const Registration: React.FC = () => {
+interface ToastMsg {
+	active: boolean,
+	message: string
+}
+
+interface RegistrationProps {
+	setToast: Dispatch<SetStateAction<ToastMsg>>
+}
+
+const Registration: React.FC<RegistrationProps> = ({setToast}: RegistrationProps) => {
 
 	const navigate = useNavigate();
 
@@ -32,10 +41,11 @@ const Registration: React.FC = () => {
 	const register = async () => {
 		await axios.post("http://localhost:4444/users", newUser, {withCredentials: true})
 		.then((res) => {
-			alert("Signed up as " + newUser.username);
+			setToast({active: true, message: "Successfully signed up as " + newUser.username + "!"})
 			navigate("/");
 		})
 		.catch((error) => {
+			setToast({active: true, message: "Something went wrong when signing up."})
 			console.log(error);
 		})
 	}

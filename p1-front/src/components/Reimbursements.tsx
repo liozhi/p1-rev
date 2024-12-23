@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { store } from "../store";
 import { useNavigate } from "react-router-dom";
 import { Container, Table, Button, Modal, Form, ToggleButton } from "react-bootstrap";
@@ -26,14 +26,28 @@ interface ReimbursementForm {
 	amount: number
 }
 
-const Reimbursements: React.FC = () => {
+interface ToastMsg {
+	active: boolean,
+	message: string
+}
+
+interface ReimbursementsProps {
+	setToast: Dispatch<SetStateAction<ToastMsg>>
+}
+
+interface Editing {
+	active: boolean,
+	reId: number
+}
+
+const Reimbursements: React.FC<ReimbursementsProps> = ({setToast}: ReimbursementsProps) => {
 
 	const [re, setRe] = useState<Reimbursement[]>([]);
 	const [shownRe, setShownRe] = useState<Reimbursement[]>([]);
 	const navigate = useNavigate();
 
 	const [showModal, setShowModal] = useState<boolean>(false);
-	const handleClose = () => setShowModal(false);
+	const handleClose = () => { setShowModal(false); setEditing({active: false, reId: 0});}
 	const handleOpen = () => setShowModal(true);
 
 	const [showOnlyPending, setShowOnlyPending] = useState<boolean>(false);
@@ -42,6 +56,8 @@ const Reimbursements: React.FC = () => {
 		description: "",
 		amount: 0
 	});
+
+	const [editing, setEditing] = useState<Editing>({active: false, reId: 0});
 
 	useEffect(() => {
 		getReimbs();
@@ -62,6 +78,7 @@ const Reimbursements: React.FC = () => {
 					if (error.response.data === "User is not logged in") {
 						store.loggedInUser = { userId: 0, username: "", role: "", firstName: "", lastName: "" };
 						localStorage.setItem("reimbUser", JSON.stringify({ userId: 0, username: "", role: "", firstName: "", lastName: "" }));
+						setToast({active: true, message: "You are not logged in!"})
 						navigate("/");
 					}
 				}
@@ -84,11 +101,13 @@ const Reimbursements: React.FC = () => {
 		}, {withCredentials: true})
 		.then((res) => {
 			console.log(res);
+			setToast({active: true, message: "New reimbursement added successfully!"})
 			handleClose();
 			getReimbs();
 		})
 		.catch((error) => {
 			console.log(error);
+			setToast({active: true, message: "Something went wrong when adding a reimbursement."})
 		})
 	}
 
@@ -103,32 +122,71 @@ const Reimbursements: React.FC = () => {
 		}
 	}
 
+	const deleteReim = async (reId: number) => {
+		await axios.delete("http://localhost:4444/reimb/" + reId, {withCredentials: true})
+		.then((res) => {
+			console.log(res.data);
+			setToast({active: true, message: "Deleted reimbursement with id " + reId + "!"})
+			getReimbs();
+		})
+		.catch((error) => {
+			console.log(error);
+			setToast({active: true, message: "Something went wrong when deleting reimbursement with id " + reId + "."})
+		})
+	}
+
+	const editReim = async(e: any) => {
+		e.preventDefault();
+		console.log(reForm.description);
+		await axios.patch("http://localhost:4444/reimb", {
+			reimbursementId: editing.reId,
+			description: reForm.description
+		}, {withCredentials: true})
+		.then((res) => {
+			console.log(res.data);
+			setToast({active: true, message: "Edited reimbursement with id " + editing.reId + "!"})
+			handleClose();
+			getReimbs();
+		})
+		.catch((error) => {
+			console.log(error);
+			setToast({active: true, message: "Something went wrong when editing reimbursement with id " + editing.reId + "."})
+		})
+	}
 
 	return (
 		<>
 			<Modal show = {showModal} onHide = {handleClose}>
 				<Modal.Body>
 					<Form>
-						<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+						{!editing.active
+						? <Form.Group className="mb-3" controlId="amountControl">
 							<Form.Label>Amount</Form.Label>
 							<Form.Control
-								type="number"
+								type = "number"
 								name = "amount"
 								onChange = {storeValues}
 								autoFocus
 							/>
 						</Form.Group>
-						<Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+						: null}
+						<Form.Group className="mb-3" controlId="descriptionControl">
 							<Form.Label>Description</Form.Label>
-							<Form.Control as="textarea" rows={2} name = "description" onChange = {storeValues}/>
+							<Form.Control as = "textarea" rows = {2} name = "description" onChange = {storeValues}/>
 						</Form.Group>
 					</Form>
 					<Button variant = "secondary" onClick = {handleClose}>
 						Close
 					</Button>
-					<Button variant = "primary" onClick = {handleSubmit}>
+					{!editing.active
+					? <Button variant = "primary" onClick = {handleSubmit}>
 						Submit
 					</Button>
+					: <Button variant = "primary" onClick = {editReim}>
+						Submit
+					</Button>
+					}
+					
 				</Modal.Body>
 			</Modal>
 			<div className = "flex flex-col justify-center align-center w-2/3 m-auto gap-2">
@@ -153,6 +211,8 @@ const Reimbursements: React.FC = () => {
 							<th>Amount</th>
 							<th>Desc</th>
 							<th>Status</th>
+							<th>Actions</th>
+							<th> </th>
 						</tr>
 					</thead>
 
@@ -170,6 +230,8 @@ const Reimbursements: React.FC = () => {
 									<td>{"$" + reim.amount}</td>
 									<td>{reim.description}</td>
 									<td><p className = {statusClass}>{reim.status.toUpperCase()}</p></td>
+									{reim.status === "pending" ? <td><Button className = "btn-danger" onClick = {() => deleteReim(reim.reimbursementId)}>Delete</Button></td> : <td></td>}
+									{reim.status === "pending" ? <td><Button className = "btn-secondary" onClick = {() => {handleOpen(); setEditing({active: true, reId: reim.reimbursementId})}}>Edit</Button></td> : <td></td>}
 								</tr>
 							)
 						})}

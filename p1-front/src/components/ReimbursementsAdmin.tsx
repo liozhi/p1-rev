@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { store } from "../store";
 import { useNavigate } from "react-router-dom";
 import { Container, Table, Button, Modal, Form, ToggleButton } from "react-bootstrap";
@@ -21,7 +21,16 @@ interface Reimbursement {
 	user: User
 }
 
-const ReimbursementsAdmin: React.FC = () => {
+interface ToastMsg {
+	active: boolean,
+	message: string
+}
+
+interface ReimbursementsProps {
+	setToast: Dispatch<SetStateAction<ToastMsg>>
+}
+
+const ReimbursementsAdmin: React.FC<ReimbursementsProps> = ({setToast}: ReimbursementsProps) => {
 
 	const [re, setRe] = useState<Reimbursement[]>([]);
 	const [shownRe, setShownRe] = useState<Reimbursement[]>([]);
@@ -60,8 +69,10 @@ const ReimbursementsAdmin: React.FC = () => {
 					if (error.response.data === "User is not logged in") {
 						store.loggedInUser = { userId: 0, username: "", role: "", firstName: "", lastName: "" };
 						localStorage.setItem("reimbUser", JSON.stringify({ userId: 0, username: "", role: "", firstName: "", lastName: "" }));
+						setToast({active: true, message: "You are not logged in!"})
 						navigate("/");
 					} else if (error.response.data === "Authorization invalid") {
+						setToast({active: true, message: "You do not have permission to view this page!"})
 						navigate("/");
 					}
 				}
@@ -72,7 +83,12 @@ const ReimbursementsAdmin: React.FC = () => {
 		await axios.patch("http://localhost:4444/reimb/all", {reimbursementId: id, status: status}, { withCredentials: true })
 		.then((res) => {
 			console.log(res.data);
+			setToast({active: true, message: "Reimbursement " + id + " set to " + status + "!"});
 			getReimbs();
+		})
+		.catch((err) => {
+			console.log(err);
+			setToast({active: true, message: "Something went wrong when updating reimbursement " + id + "."});
 		})
 	}
 

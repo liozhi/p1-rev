@@ -4,9 +4,11 @@ import com.revature.aspects.AdminOnly;
 import com.revature.models.Reimbursement;
 import com.revature.models.dtos.IncomingReimbursementDTO;
 import com.revature.models.dtos.OutgoingReimbursementDTO;
+import com.revature.models.dtos.UpdateDescriptionDTO;
 import com.revature.models.dtos.UpdateReimbursementDTO;
 import com.revature.services.ReimbursementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +48,18 @@ public class ReimbursementController {
     @AdminOnly
     public ResponseEntity<OutgoingReimbursementDTO> updateReimbursement(@RequestBody UpdateReimbursementDTO re) {
         OutgoingReimbursementDTO newRe = reimbursementService.updateReimbursement(re.getReimbursementId(), re.getStatus());
+        return ResponseEntity.status(201).body(newRe);
+    }
+
+    @DeleteMapping("/{reId}")
+    public ResponseEntity<HttpStatus> deleteReimbursement(@PathVariable int reId) {
+        reimbursementService.deleteReimbursement(reId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping
+    public ResponseEntity<OutgoingReimbursementDTO> updateReimbursementDescription(@RequestBody UpdateDescriptionDTO re) {
+        OutgoingReimbursementDTO newRe = reimbursementService.updateReimbursementDescription(re.getReimbursementId(), re.getDescription());
         return ResponseEntity.status(201).body(newRe);
     }
 }

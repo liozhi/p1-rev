@@ -5,6 +5,7 @@ import com.revature.models.dtos.OutgoingUserDTO;
 import com.revature.services.AuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,4 +37,14 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<HttpStatus> logout(HttpSession session) {
+        session.setAttribute("userId", null);
+        session.setAttribute("username", "");
+        session.setAttribute("firstName", "");
+        session.setAttribute("lastName", "");
+        session.setAttribute("role", "");
+        session.invalidate();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
